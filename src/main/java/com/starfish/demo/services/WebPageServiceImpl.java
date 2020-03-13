@@ -53,7 +53,7 @@ public class WebPageServiceImpl implements WebPageService {
         try {
             Map<String, Set<String>> parseResults = getLinks(weblink, size);
 
-            String url = "localhost:8080/webpage/add";
+            String url = "localhost:8080/backend/add";
             RestTemplate restTemplate = new RestTemplate();
 
             HttpEntity<Map<String, Set<String>>> request = new HttpEntity<>(parseResults);
@@ -69,7 +69,7 @@ public class WebPageServiceImpl implements WebPageService {
     public ResponseEntity<WebPageSetDTO> findParsedResult(String weblink) {
         RestTemplate restTemplate = new RestTemplate();
 
-        String url = "localhost:8080/webpage/find";
+        String url = "localhost:8080/backend/find";
         Map<String, String> variables = new HashMap<>();
         variables.put("weblink", weblink);
         WebPageSetDTO webPageSetDTO =
