@@ -1,5 +1,6 @@
 package com.starfish.demo.services;
 
+import com.starfish.demo.DTO.WebPageSetDTO;
 import com.starfish.demo.entities.WebPage;
 import com.starfish.demo.repositories.WebPageRepository;
 import lombok.NonNull;
@@ -72,11 +73,11 @@ public class DataAccessServiceImpl implements DataAccessService {
     }
 
     @Override
-    public ResponseEntity<Set<WebPage>> findWebPageData(String webLink) {
+    public WebPageSetDTO findWebPageData(String webLink) {
         WebPage webPage = webPageRepository.findFirstByWebLink(webLink);
 
         if (webPage == null)
-            return new ResponseEntity<Set<WebPage>>(new HashSet<>(), HttpStatus.BAD_REQUEST);
+            return new WebPageSetDTO(new HashSet<>(), HttpStatus.BAD_REQUEST);
 
         Set<WebPage> resultSet = new HashSet<>();
         Queue<WebPage> webPageQueue = new PriorityQueue<>();
@@ -98,7 +99,7 @@ public class DataAccessServiceImpl implements DataAccessService {
             }
         }
 
-        return ResponseEntity.ok(resultSet);
+        return new WebPageSetDTO(resultSet, HttpStatus.OK);
 
     }
 

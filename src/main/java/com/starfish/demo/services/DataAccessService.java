@@ -1,5 +1,6 @@
 package com.starfish.demo.services;
 
+import com.starfish.demo.DTO.WebPageSetDTO;
 import com.starfish.demo.entities.WebPage;
 import org.springframework.http.ResponseEntity;
 
@@ -8,5 +9,5 @@ import java.util.Set;
 
 public interface DataAccessService {
     void saveNewWebPageData(Map<String, Set<String>> newData);
-    ResponseEntity<Set<WebPage> >findWebPageData(String webLink);
+    WebPageSetDTO findWebPageData(String webLink);
 }
