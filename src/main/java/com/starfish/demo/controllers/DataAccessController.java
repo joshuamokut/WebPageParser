@@ -13,7 +13,7 @@ import java.util.Set;
 
 @AllArgsConstructor
 @RestController
-@RequestMapping(value = "/webpage")
+@RequestMapping(value = "/backend")
 public class DataAccessController {
     DataAccessService dataAccessService;
 
