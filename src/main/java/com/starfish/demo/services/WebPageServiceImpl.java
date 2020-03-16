@@ -5,11 +5,10 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 import java.util.*;
@@ -17,6 +16,7 @@ import java.util.*;
 @Service
 
 public class WebPageServiceImpl implements WebPageService {
+
 
     private Map<String, Set<String>> getLinks(String weblink, int size) throws IOException {
         Map<String, Set<String>> results = new HashMap<>();
@@ -37,11 +37,20 @@ public class WebPageServiceImpl implements WebPageService {
             for (Element link : links) {
                 String externalLink = link.attr("abs:href");
                 if (!visitedLinks.contains(externalLink)) {
-                    results.get(currentLink).add(externalLink);
+                    if (results.get(currentLink) == null) {
+                        Set<String> set = new HashSet<>();
+                        set.add(externalLink);
+                        results.put(currentLink, set);
+                    } else {
+                        results.get(currentLink).add(externalLink);
+                    }
                     size--;
                     visitedLinks.add(externalLink);
                     linkQueue.add(externalLink);
                 }
+
+                if (size == 0)
+                    break;
             }
         }
 
@@ -53,14 +62,13 @@ public class WebPageServiceImpl implements WebPageService {
         try {
             Map<String, Set<String>> parseResults = getLinks(weblink, size);
 
-            String url = "localhost:8080/backend/add";
+            String url = "http://localhost:8080/backend/add";
             RestTemplate restTemplate = new RestTemplate();
-
             HttpEntity<Map<String, Set<String>>> request = new HttpEntity<>(parseResults);
-
-            return restTemplate.postForEntity(url, request, String.class);
+            return restTemplate.exchange(url, HttpMethod.POST, request, String.class);
 
         } catch (IOException e) {
+            e.printStackTrace();
             return new ResponseEntity<>("An error occurred. PLease check the web link", HttpStatus.BAD_REQUEST);
         }
     }
@@ -69,14 +77,15 @@ public class WebPageServiceImpl implements WebPageService {
     public ResponseEntity<WebPageSetDTO> findParsedResult(String weblink) {
         RestTemplate restTemplate = new RestTemplate();
 
-        String url = "localhost:8080/backend/find";
-        Map<String, String> variables = new HashMap<>();
-        variables.put("weblink", weblink);
-        WebPageSetDTO webPageSetDTO =
-                restTemplate.getForObject(url, WebPageSetDTO.class, variables);
+        String url = "http://localhost:8080/backend/find";
 
-        assert webPageSetDTO != null;
+        UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromHttpUrl(url)
+                .queryParam("weblink", weblink);
 
-        return new ResponseEntity<>(webPageSetDTO, webPageSetDTO.getHttpStatus());
+        HttpEntity<WebPageSetDTO> httpEntity = new HttpEntity<>(new HttpHeaders());
+
+
+        return restTemplate.exchange(uriComponentsBuilder.toUriString(),
+                HttpMethod.GET, httpEntity, WebPageSetDTO.class);
     }
 }
