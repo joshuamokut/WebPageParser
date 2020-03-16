@@ -80,21 +80,21 @@ public class DataAccessServiceImpl implements DataAccessService {
             return new WebPageSetDTO(new HashSet<>(), HttpStatus.BAD_REQUEST);
 
         Set<WebPage> resultSet = new HashSet<>();
-        Queue<WebPage> webPageQueue = new PriorityQueue<>();
+        ArrayDeque<WebPage> webPageQueue = new ArrayDeque<>();
         Set<WebPage> visited = new HashSet<>();
 
         visited.add(webPage);
         webPageQueue.add(webPage);
 
         while (!webPageQueue.isEmpty()) {
-            WebPage frontPage = webPageQueue.peek();
-            webPageQueue.remove(frontPage);
-            resultSet.add(frontPage);
+            WebPage frontPage = webPageQueue.removeFirst();
+
 
             for (WebPage page : frontPage.getExternalLinks()) {
                 if (!visited.contains(page)) {
                     visited.add(page);
                     webPageQueue.add(page);
+                    resultSet.add(page);
                 }
             }
         }
