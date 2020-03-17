@@ -12,6 +12,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 
@@ -32,10 +33,10 @@ public class WebPageServiceImpl implements WebPageService {
             linkQueue.remove(currentLink);
 
             Document document = Jsoup.connect(weblink).get();
-            Elements links = document.select("a[href]");
+            List<String> links = document.select("a[href]").stream().map(
+                    element -> element.attr("abs:href")).collect(Collectors.toList());
 
-            for (Element link : links) {
-                String externalLink = link.attr("abs:href");
+            for (String externalLink : links) {
                 if (!visitedLinks.contains(externalLink)) {
                     if (results.get(currentLink) == null) {
                         Set<String> set = new HashSet<>();
