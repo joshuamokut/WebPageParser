@@ -3,6 +3,7 @@ package com.starfish.demo.services;
 import com.starfish.demo.DTO.WebPageSetDTO;
 import com.starfish.demo.entities.WebPage;
 import com.starfish.demo.repositories.WebPageRepository;
+import lombok.Data;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,8 +16,8 @@ import java.util.*;
 @RequiredArgsConstructor
 public class DataAccessServiceImpl implements DataAccessService {
     // this is just an optimization fix just like caching
-    private static Map<String, WebPage> webPageMemoize =
-            new HashMap<>();
+    @NonNull
+    private HashMap<String, WebPage> webPageMemoize;
     @NonNull
     private final WebPageRepository webPageRepository;
 
@@ -39,7 +40,7 @@ public class DataAccessServiceImpl implements DataAccessService {
      */
 
     @Override
-    public void saveNewWebPageData(Map<String, Set<String>> newData) {
+    public void saveNewWebPageData(Map<String, Set<String> > newData) {
         for (String webLink : newData.keySet()) {
             WebPage webPage = getWebPageEntity(webLink);
 
