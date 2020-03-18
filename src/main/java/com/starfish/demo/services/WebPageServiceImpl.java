@@ -1,10 +1,8 @@
 package com.starfish.demo.services;
 
+import com.starfish.demo.DTO.ParseResultMapDTO;
 import com.starfish.demo.DTO.WebPageSetDTO;
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -17,6 +15,15 @@ import java.util.stream.Collectors;
 @Service
 
 public class WebPageServiceImpl implements WebPageService {
+
+    private final JsoupService jsoupService;
+
+    private final RestTemplateService restTemplateService;
+
+    public WebPageServiceImpl(JsoupService jsoupService, RestTemplateService restTemplateService) {
+        this.jsoupService = jsoupService;
+        this.restTemplateService = restTemplateService;
+    }
 
 
     private Map<String, Set<String>> getLinks(String weblink, int size) throws IOException {
@@ -32,7 +39,7 @@ public class WebPageServiceImpl implements WebPageService {
             String currentLink = linkQueue.peek();
             linkQueue.remove(currentLink);
 
-            Document document = Jsoup.connect(weblink).get();
+            Document document = jsoupService.getDoc(currentLink);
             List<String> links = document.select("a[href]").stream().map(
                     element -> element.attr("abs:href")).collect(Collectors.toList());
 
@@ -59,18 +66,21 @@ public class WebPageServiceImpl implements WebPageService {
     }
 
     @Override
-    public ResponseEntity<String> requestParse(String weblink, int size) {
+    public ParseResultMapDTO requestParse(String weblink, int size) {
         try {
             Map<String, Set<String>> parseResults = getLinks(weblink, size);
 
             String url = "http://localhost:8080/backend/add";
-            RestTemplate restTemplate = new RestTemplate();
             HttpEntity<Map<String, Set<String>>> request = new HttpEntity<>(parseResults);
-            return restTemplate.exchange(url, HttpMethod.POST, request, String.class);
+
+            restTemplateService.postExchange(url, HttpMethod.POST, request, String.class);
+            return new ParseResultMapDTO(ResponseEntity.ok("All good, result added"), parseResults);
 
         } catch (IOException e) {
             e.printStackTrace();
-            return new ResponseEntity<>("An error occurred. PLease check the web link", HttpStatus.BAD_REQUEST);
+            return new ParseResultMapDTO(new ResponseEntity<>("Something went wrong, please check the url",
+                    HttpStatus.BAD_REQUEST),
+                    new HashMap<>());
         }
     }
 
