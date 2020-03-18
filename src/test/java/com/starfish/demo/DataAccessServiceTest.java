@@ -11,22 +11,25 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.lenient;
 
 @ExtendWith(MockitoExtension.class)
 
 public class DataAccessServiceTest {
+
 
     @Mock
     WebPageRepository webPageRepository;
 
     @Mock
     HashMap<String, WebPage> webPageMemoize;
+
 
     String weblink;
     WebPage webpage;
@@ -39,7 +42,6 @@ public class DataAccessServiceTest {
 
     String string3;
     DataAccessServiceImpl dataAccessService;
-
 
     Map<String, Set<String>> newData;
 
@@ -56,7 +58,9 @@ public class DataAccessServiceTest {
 
         string3 = "http://starfish.com";
 
+
         dataAccessService = new DataAccessServiceImpl(webPageMemoize, webPageRepository);
+
         webpage.setId(1L);
         webPage1.setId(50L);
         webPage2.setId(25L);
@@ -77,10 +81,10 @@ public class DataAccessServiceTest {
         newData.put(string1, webpage1Set);
         newData.put(string2, webpage2Set);
 
-        when(webPageRepository.findFirstByWebLink(weblink)).thenReturn(webpage);
-        when(webPageRepository.findFirstByWebLink(string1)).thenReturn(webPage1);
-        when(webPageRepository.findFirstByWebLink(string2)).thenReturn(webPage2);
-        when(webPageRepository.findFirstByWebLink(string3)).thenReturn(null);
+        lenient().when(webPageRepository.findFirstByWebLink(weblink)).thenReturn(webpage);
+        lenient().when(webPageRepository.findFirstByWebLink(string1)).thenReturn(webPage1);
+        lenient().when(webPageRepository.findFirstByWebLink(string2)).thenReturn(webPage2);
+        lenient().when(webPageRepository.findFirstByWebLink(string3)).thenReturn(null);
 
     }
 
@@ -122,5 +126,6 @@ public class DataAccessServiceTest {
 
         testFindWebPageDate();
     }
+
 
 }
