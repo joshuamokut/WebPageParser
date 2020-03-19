@@ -5,4 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface WebPageRepository extends JpaRepository<WebPage, Long> {
     WebPage findFirstByWebLink(String webLink);
+
 }
