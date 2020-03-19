@@ -22,9 +22,11 @@ public class WebPage {
     private Long id;
 
     @NonNull
+    //@Lob // this is a JPA annotation for large objects
+    @Column(columnDefinition = "TEXT")
     private String webLink;
 
-    @OneToMany
+    @ManyToMany
     @JsonIgnore
     private Set<WebPage> externalLinks = new HashSet<>();
 
