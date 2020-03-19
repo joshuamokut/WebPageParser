@@ -2,7 +2,10 @@ package com.starfish.demo.services;
 
 import com.starfish.demo.DTO.ParseResultMapDTO;
 import com.starfish.demo.DTO.WebPageSetDTO;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.jsoup.nodes.Document;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -13,18 +16,15 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-
 public class WebPageServiceImpl implements WebPageService {
 
     private final JsoupService jsoupService;
-
     private final RestTemplateService restTemplateService;
 
     public WebPageServiceImpl(JsoupService jsoupService, RestTemplateService restTemplateService) {
         this.jsoupService = jsoupService;
         this.restTemplateService = restTemplateService;
     }
-
 
     private Map<String, Set<String>> getLinks(String weblink, int size) throws IOException {
         Map<String, Set<String>> results = new HashMap<>();
